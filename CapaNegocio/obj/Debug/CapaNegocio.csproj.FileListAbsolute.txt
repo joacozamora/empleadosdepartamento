@@ -1,0 +1,11 @@
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\bin\Debug\CapaNegocio.dll
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\bin\Debug\CapaNegocio.pdb
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\bin\Debug\CapaDatos.dll
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\bin\Debug\Entidades.dll
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\bin\Debug\CapaDatos.pdb
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\bin\Debug\Entidades.pdb
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\obj\Debug\CapaNegocio.csproj.AssemblyReference.cache
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\obj\Debug\CapaNegocio.csproj.CoreCompileInputs.cache
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\obj\Debug\CapaNegocio.csproj.CopyComplete
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\obj\Debug\CapaNegocio.dll
+C:\Users\joaco\OneDrive\Escritorio\VS2023\tpfede\GestionEmpleadoIEFI\CapaNegocio\obj\Debug\CapaNegocio.pdb

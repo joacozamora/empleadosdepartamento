@@ -27,5 +27,18 @@ namespace CapaNegocio
 		{
 			return DatosObjDepartamento.ObtenerDepartamento();
 		}
+
+		public List<Departamento> ObtenerId(string nombre)
+		{
+			return DatosObjDepartamento.ObtenerId(nombre);
+		}
+
+		public bool HayEmpleadosAsociados(string nombreDepartamento)
+		{
+			// Implementa la lógica para verificar si hay empleados asociados
+			// Puedes usar el método de la capa de datos para realizar esta verificación
+
+			return DatosObjDepartamento.HayEmpleadosAsociados(nombreDepartamento);
+		}
 	}
 }

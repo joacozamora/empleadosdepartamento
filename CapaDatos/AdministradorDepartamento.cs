@@ -131,5 +131,78 @@ namespace CapaDatos
 			return lista;
 		}
 
+		public List<Departamento> ObtenerId(string nombre)
+		{
+			List<Departamento> lista = new List<Departamento>();
+
+			string OrdenEjecucion = $"Select id_departamento from Departamento where nombreDepartamento = '{nombre}'";
+
+			SqlCommand cmd = new SqlCommand(OrdenEjecucion, conexion);
+
+			SqlDataReader dataReader;
+
+			try
+			{
+				Abrirconexion();
+
+				dataReader = cmd.ExecuteReader();
+
+				while (dataReader.Read())
+				{
+
+
+					int codigo = dataReader.GetInt32(0);
+					//int idDepa = $"{codigo}";
+
+					Departamento departamento = new Departamento();
+
+					departamento.id = codigo;
+
+					lista.Add(departamento);
+
+				}
+			}
+			catch (Exception e)
+			{
+
+				throw new Exception("Error al obtener el id de departamento", e);
+
+			}
+
+			finally
+			{
+				Cerrarconexion();
+				cmd.Dispose();
+			}
+
+			return lista;
+		}
+
+		public bool HayEmpleadosAsociados(string nombreDepartamento)
+		{
+			//int resultado = -1;
+			string consulta = "SELECT COUNT(*) FROM Empleado WHERE id_depto = (SELECT top 1 id_departamento FROM Departamento WHERE nombreDepartamento = @NombreDepartamento)";
+			SqlCommand cmd = new SqlCommand(consulta, conexion);
+			cmd.Parameters.AddWithValue("@NombreDepartamento", nombreDepartamento);
+			try
+			{
+				Abrirconexion();
+				int cantidadEmpleados = (int)cmd.ExecuteScalar();
+				return cantidadEmpleados > 0;
+			}
+			catch (Exception e)
+			{
+				throw new Exception($"Error al tratar de obtener empleados asociados ", e);
+			}
+			finally
+			{
+				Cerrarconexion();
+				cmd.Dispose();
+			}
+			
+			
+			
+		}
+
 	}
 }

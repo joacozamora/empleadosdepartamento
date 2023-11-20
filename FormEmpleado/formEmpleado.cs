@@ -10,14 +10,17 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CapaNegocio;
 using System.Security.Cryptography;
-
+using System.Xml.Linq;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
+using System.IO;
+//using iTextSharp.text.pdf.parser;
 
 namespace FormEmpleado
 {
     public partial class formEmpleado : Form
     {
-        Empleado NuevoEmpleado;
-        Empleado EmpleadoExistente;
+        
         
         
         bool nuevo = true;
@@ -48,8 +51,10 @@ namespace FormEmpleado
             LlenarDGVEmpleado();
             LlenarDGVDepartamento();
             LlenarCombo();
+            MostrarId();
 			dgvEmpleado.CellClick += new DataGridViewCellEventHandler(dgvEmpleado_CellClick);
 			dgvDepa.CellClick += new DataGridViewCellEventHandler(dgvDepa_CellClick);
+			comDep.SelectedIndexChanged += (sender, e) => MostrarId();
 
 
 		}
@@ -118,7 +123,7 @@ namespace FormEmpleado
 
         private void LimpiarDepartamento()
         {
-            txtId.Text = string.Empty;
+            
             txtNombreDepartamento.Text = string.Empty;
             
 
@@ -306,6 +311,7 @@ namespace FormEmpleado
             objEntEmpleado.segundoapellido = txt2ap.Text;
             objEntEmpleado.correo = txtCor.Text;
             objEntEmpleado.departamento = comDep.SelectedValue.ToString();
+            objEntEmpleado.id_depto = MostrarId();
 
             DateTime fechaNacEmpleado;
             if (DateTime.TryParse(FechaNacEmpleado.Value.ToString(), out fechaNacEmpleado))
@@ -386,6 +392,50 @@ namespace FormEmpleado
             comDep.ValueMember = "departamento";
 
 		}
+
+		private int MostrarId()
+		{
+            int id = -1;
+            try
+            {
+				string nomdepto = comDep.SelectedValue?.ToString();
+
+				if (string.IsNullOrEmpty(nomdepto))
+				{
+					//id_depa.Text = "Ningun depto cargado";
+
+				}
+				else
+				{
+					List<Departamento> listaDepartamentos = objNegDepartamento.ObtenerId(nomdepto);
+
+					if (listaDepartamentos.Count > 0)
+					{
+						int idDepartamento = listaDepartamentos[0].id;
+						//id_depa.Text = idDepartamento.ToString();
+                        id = idDepartamento;
+					}
+					else
+					{
+						//id_depa.Text = "No se encontró ningún departamento con el nombre seleccionado";
+					}
+				}
+                return id;
+			}
+
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al mostrar el Id del departamento: {ex.Message}");
+            }
+
+
+            return id;
+
+			
+            
+
+
+		}
 		private void dgvDepa_CellClick(object sender, DataGridViewCellEventArgs e)
 		{
 			if (e.RowIndex >= 0)
@@ -403,41 +453,76 @@ namespace FormEmpleado
 
 		private void btn_BorrarDepa_Click(object sender, EventArgs e)
 		{
-			DataRow DepAEliminar = null;
-			DataSet ds = objNegDepartamento.listaDepartamento("Todos");
+			string nombreDepartamentoSeleccionado = comDep.SelectedValue.ToString();
+            if (objNegDepartamento.HayEmpleadosAsociados(nombreDepartamentoSeleccionado))
+            {
+                MessageBox.Show("No se puede eliminar el departamento. Hay empleados asociados.");
+                return; // No continúes con la eliminación
+            }
+            else
+            {
 
-			string nomDep = txtNombreDepartamento.Text;
+                DataRow DepAEliminar = null;
+                DataSet ds = objNegDepartamento.listaDepartamento("Todos");
 
-			foreach (DataRow dr in ds.Tables[0].Rows)
+                string nomDep = txtNombreDepartamento.Text;
+
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    if (dr[1].ToString() == nomDep)
+                    {
+                        DepAEliminar = dr;
+                        break;
+                    }
+                }
+
+                if (DepAEliminar != null)
+                {
+                    string nom = DepAEliminar[1].ToString();
+                    Departamento departamento = new Departamento(0, nom); // Ajusta los valores adecuados en el constructor de Productos
+
+                    int resultado = objNegDepartamento.abmDepartamento("Borrar", departamento);
+
+                    if (resultado > 0)
+                    {
+                        MessageBox.Show("Departamento eliminado correctamente");
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se pudo eliminar el Departamento");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("El Departamento no se encontró en la lista");
+                }
+
+            }
+				LlenarDGVDepartamento();
+			
+			
+		}
+
+		private void ActualizarEstadoBotonBorrar()
+		{
+			string nombreDepartamentoSeleccionado = comDep.SelectedValue.ToString();
+
+			if (objNegDepartamento.HayEmpleadosAsociados(nombreDepartamentoSeleccionado))
 			{
-				if (dr[1].ToString() == nomDep)
-				{
-					DepAEliminar = dr;
-					break;
-				}
-			}
-
-			if (DepAEliminar != null)
-			{
-				string nom = DepAEliminar[1].ToString();
-				Departamento departamento = new Departamento(0, nom); // Ajusta los valores adecuados en el constructor de Productos
-
-				int resultado = objNegDepartamento.abmDepartamento("Borrar", departamento);
-
-				if (resultado > 0)
-				{
-					MessageBox.Show("Departamento eliminado correctamente");
-				}
-				else
-				{
-					MessageBox.Show("No se pudo eliminar el Departamento");
-				}
+				// Hay empleados asociados, deshabilita el botón
+				btn_BorrarDepa.Enabled = false;
 			}
 			else
 			{
-				MessageBox.Show("El Departamento no se encontró en la lista");
+				// No hay empleados asociados, habilita el botón
+				btn_BorrarDepa.Enabled = true;
 			}
-            LlenarDGVDepartamento();
+		}
+
+		// Este evento se ejecuta cuando cambia la selección en tu ComboBox
+		private void comDep_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			ActualizarEstadoBotonBorrar();
 		}
 
 		private void dgvEmpleado_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -484,7 +569,7 @@ namespace FormEmpleado
 			{ //public Empleado(int id, string nombreempleado, string primerapellido, string segundoapellido, string departamento, string correo, DateTime fechanacimiento, int dni)
 
 				int dni = int.Parse(EmpAEliminar[7].ToString());
-				Empleado empleado = new Empleado(0, null, null, null, null, null, fechaNacimiento, dni); // Ajusta los valores adecuados en el constructor de Productos
+				Empleado empleado = new Empleado(0, null, null, null, null, null, fechaNacimiento, dni, 0); // Ajusta los valores adecuados en el constructor de Productos
 
 				int resultado = objNegEmpleado.abmEmpleado("Borrar", empleado);
 
@@ -502,6 +587,67 @@ namespace FormEmpleado
 				MessageBox.Show("El Empleado no se encontró en la lista");
 			}
             LlenarDGVEmpleado();
+            LimpiarDepartamento();
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			Document doc = new Document();
+			string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+			string pdfPath = Path.Combine(desktopPath, "Reporte.pdf");
+
+			PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(pdfPath, FileMode.Create));
+			doc.Open();
+
+			AddDataToPDF(doc, dgvEmpleado, "Datos de Empleados");
+			AddDataToPDF(doc, dgvDepa, "Datos de Departamentos");
+			
+
+			doc.Close();
+			writer.Close();
+
+			MessageBox.Show("PDF generado correctamente en el escritorio.");
+		}
+
+		
+
+
+
+		private void AddDataToPDF(Document doc, DataGridView dgv, string title)
+		{
+			PdfPTable table = new PdfPTable(dgv.ColumnCount);
+			table.WidthPercentage = 100;
+
+
+			PdfPCell cell = new PdfPCell(new Phrase(title));
+			cell.Colspan = dgv.ColumnCount;
+			cell.HorizontalAlignment = 1;
+			table.AddCell(cell);
+
+
+			foreach (DataGridViewColumn column in dgv.Columns)
+			{
+				table.AddCell(column.HeaderText);
+			}
+
+
+			foreach (DataGridViewRow row in dgv.Rows)
+			{
+				foreach (DataGridViewCell cell2 in row.Cells)
+				{
+					if (cell2.Value != null)
+					{
+						table.AddCell(cell2.Value.ToString());
+					}
+					else
+					{
+						table.AddCell("");
+					}
+				}
+			}
+
+			doc.Add(table);
 		}
 	}
 

@@ -28,7 +28,8 @@ namespace CapaDatos
                     $",'{objEmpleado.correo}'" +
                     $",'{objEmpleado.departamento}'" +
                     $",'{objEmpleado.fechanacimiento}'" +
-                    $",'{objEmpleado.dni}')";
+					$",'{objEmpleado.dni}'" +
+					$",'{objEmpleado.id_depto}')";
 
             //Set: De que atributo modificar
             //where: lo que no se puede modificar
@@ -39,7 +40,7 @@ namespace CapaDatos
                     $"where DNI = '{objEmpleado.dni}'; update Empleado set segundoApellido = '{objEmpleado.segundoapellido}' " +
                     $"where DNI = '{objEmpleado.dni}'; update Empleado set correo = '{objEmpleado.correo}' " +
                     $"where DNI = '{objEmpleado.dni}'; update Empleado set departamento = '{objEmpleado.departamento}' " +
-                    $"where DNI = '{objEmpleado.dni}'; update Empleado set fechaNacimiento = '{objEmpleado.fechanacimiento}'";
+                    $"where DNI = '{objEmpleado.dni}'; update Empleado set fechaNacimiento = '{objEmpleado.fechanacimiento}' where DNI = '{objEmpleado.dni}'; update Empleado set id_depto = {objEmpleado.id_depto} where DNI = '{objEmpleado.dni}'";
 
             if (accion == "Borrar")
                 orden = $"delete from Empleado where dni = {objEmpleado.dni}";
